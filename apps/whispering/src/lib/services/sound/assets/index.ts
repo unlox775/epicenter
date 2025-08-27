@@ -1,7 +1,7 @@
 import type { WhisperingSoundNames } from '$lib/constants/sounds';
 import {
-	default as captureVadSoundSrc,
-	default as stopManualSoundSrc,
+        default as captureVadSoundSrc,
+        default as stopManualSoundSrc,
 } from './sound_ex_machina_Button_Blip.mp3';
 import startManualSoundSrc from './zapsplat_household_alarm_clock_button_press_12967.mp3';
 import stopVadSoundSrc from './zapsplat_household_alarm_clock_large_snooze_button_press_001_12968.mp3';
@@ -10,13 +10,21 @@ import cancelSoundSrc from './zapsplat_multimedia_click_button_short_sharp_73510
 import transformationCompleteSoundSrc from './zapsplat_multimedia_notification_alert_ping_bright_chime_001_93276.mp3';
 import transcriptionCompleteSoundSrc from './zapsplat_multimedia_ui_notification_classic_bell_synth_success_107505.mp3';
 
-export const audioElements = {
-	'manual-start': new Audio(startManualSoundSrc),
-	'manual-cancel': new Audio(cancelSoundSrc),
-	'manual-stop': new Audio(stopManualSoundSrc),
-	'vad-start': new Audio(startVadSoundSrc),
-	'vad-capture': new Audio(captureVadSoundSrc),
-	'vad-stop': new Audio(stopVadSoundSrc),
-	transcriptionComplete: new Audio(transcriptionCompleteSoundSrc),
-	transformationComplete: new Audio(transformationCompleteSoundSrc),
-} satisfies Record<WhisperingSoundNames, HTMLAudioElement>;
+export const audioContext = new AudioContext();
+
+async function load(src: string): Promise<AudioBuffer> {
+        const response = await fetch(src);
+        const arrayBuffer = await response.arrayBuffer();
+        return audioContext.decodeAudioData(arrayBuffer);
+}
+
+export const audioBuffers = {
+        'manual-start': load(startManualSoundSrc),
+        'manual-cancel': load(cancelSoundSrc),
+        'manual-stop': load(stopManualSoundSrc),
+        'vad-start': load(startVadSoundSrc),
+        'vad-capture': load(captureVadSoundSrc),
+        'vad-stop': load(stopVadSoundSrc),
+        transcriptionComplete: load(transcriptionCompleteSoundSrc),
+        transformationComplete: load(transformationCompleteSoundSrc),
+} satisfies Record<WhisperingSoundNames, Promise<AudioBuffer>>;
