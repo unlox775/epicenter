@@ -45,6 +45,7 @@ pub async fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_http::init())
+        .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
@@ -66,6 +67,7 @@ pub async fn run() {
     // Register command handlers (same for all platforms now)
     let builder = builder.invoke_handler(tauri::generate_handler![
         write_text,
+        log_web_audio,
         // Audio recorder commands
         get_current_recording_id,
         enumerate_recording_devices,
@@ -101,6 +103,16 @@ pub async fn run() {
 
 use enigo::{Direction, Enigo, Key, Keyboard, Settings};
 use tauri_plugin_clipboard_manager::ClipboardExt;
+use log::{info, debug};
+
+/// Logs WebAudio debug messages to Tauri's logging system
+#[tauri::command]
+async fn log_web_audio(message: String) -> Result<(), String> {
+    println!("[TAURI-LOG] {}", message);
+    info!("{}", message);
+    debug!("[DEBUG] {}", message);
+    Ok(())
+}
 
 /// Writes text at the cursor position using the clipboard sandwich technique
 ///
